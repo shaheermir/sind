@@ -1,5 +1,5 @@
 async function loadMonstersApi() {
-  await sleep(5000)
+  await sleep(2000)
   const response = await fetch("https://jsonplaceholder.typicode.com/users")
   return response.json()
 }
