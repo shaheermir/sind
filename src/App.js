@@ -1,25 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react"
+import { connect } from "react-redux"
+import CardList from "./components/card-list/CardList"
+import SearchBar from "./components/search-bar/search-bar"
+import Count from "./components/count/Count"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  state = {
+    searchTerm: "",
+  }
+
+  componentDidMount() {
+    this.props.loadMonsters()
+  }
+
+  onChange = (event) => {
+    const value = event.target.value
+    this.setState({ searchTerm: value })
+  }
+
+  render() {
+    const { searchTerm } = this.state
+    const monsters = this.props.monsters.data
+
+    const filteredMonsters = monsters.filter((m) =>
+      m.name.toLowerCase().includes(searchTerm)
+    )
+
+    const loading = <div>Loading....</div>
+    const content = <CardList monsters={filteredMonsters} />
+
+    return (
+      <div>
+        <Count />
+        <SearchBar value={searchTerm} onChange={this.onChange} />
+        {this.props.monsters.loading ? loading : content}
+      </div>
+    )
+  }
 }
 
-export default App;
+function mapStateToProps(state) {
+  return {
+    monsters: state.monsters,
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    loadMonsters: () => dispatch({ type: "LOAD_MONSTERS_REQUEST" }),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)
